@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .form-input, .form-file {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-file {
+            padding: 0.5rem; /* Điều chỉnh padding cho input file */
+        }
+        .form-input:focus, .form-file:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .btn-primary {
+            background-color: #2563eb;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #1d4ed8;
+        }
+        .btn-danger {
+            background-color: #dc2626;
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-4xl font-bold text-gray-800 mb-8 border-b pb-4">Admin Dashboard</h1>
+
+        <!-- ================================== -->
+        <!--        PHẦN QUẢN LÝ SẢN PHẨM       -->
+        <!-- ================================== -->
+        <section id="product-management">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Quản lý Sản phẩm</h2>
+            
+            <!-- Form Thêm Sản phẩm -->
+            <form id="add-product-form" class="bg-gray-50 p-6 rounded-lg mb-8 space-y-4">
+                <h3 class="text-lg font-semibold">Thêm sản phẩm mới</h3>
+                <div>
+                    <label for="product-name" class="block text-sm font-medium text-gray-700 mb-1">Tên sản phẩm</label>
+                    <input type="text" id="product-name" required class="form-input" placeholder="Ví dụ: Áo thun cao cấp">
+                </div>
+                <div>
+                    <label for="product-price" class="block text-sm font-medium text-gray-700 mb-1">Giá (VND)</label>
+                    <input type="number" id="product-price" required class="form-input" placeholder="Ví dụ: 350000">
+                </div>
+                <div>
+                    <label for="product-image" class="block text-sm font-medium text-gray-700 mb-1">Hình ảnh sản phẩm</label>
+                    <input type="file" id="product-image" accept="image/*" required class="form-file">
+                </div>
+                <div id="upload-progress-container" class="hidden w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="upload-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+                <button type="submit" id="add-product-btn" class="btn btn-primary">
+                    <span id="btn-text">Thêm sản phẩm</span>
+                    <div id="btn-spinner" class="spinner hidden"></div>
+                </button>
+            </form>
+
+            <!-- Danh sách Sản phẩm -->
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Danh sách Sản phẩm</h2>
+            <div id="product-list-container">
+                 <!-- Dữ liệu sản phẩm sẽ được chèn vào đây bởi admin.js -->
+                <p class="text-gray-500">Đang tải danh sách sản phẩm...</p>
+            </div>
+        </section>
+
+        <hr class="my-12">
+
+        <!-- ================================== -->
+        <!--         PHẦN QUẢN LÝ ĐƠN HÀNG      -->
+        <!-- ================================== -->
+        <section id="order-management">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Quản lý Đơn hàng</h2>
+            
+            <div id="order-list-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Email Khách hàng</th>
+                            <th>Tổng tiền (VND)</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-list-body">
+                        <!-- Dữ liệu đơn hàng sẽ được chèn vào đây bởi admin.js -->
+                        <tr>
+                            <td colspan="3" class="text-center text-gray-500">Đang tải danh sách đơn hàng...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <!-- Script tùy chỉnh -->
+    <script src="admin.js"></script>
+</body>
+</html>

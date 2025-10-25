@@ -1,0 +1,5 @@
+{
+  "name": "AhBra Login Page",
+  "description": "A stylish and responsive login page for the 'AhBra' brand, featuring a two-column layout with a brand image and a comprehensive login form. Built with React, TypeScript, and Tailwind CSS.",
+  "requestFramePermissions": []
+}
